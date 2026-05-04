@@ -77,7 +77,12 @@ ${rawText}
 
     let parsed: any;
     try {
-      const cleaned = content.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
+      // MiniMax M2.7 may include <think> tags (chain-of-thought) — strip them
+      const cleaned = content
+        .replace(/<think>[\s\S]*?<\/think>\s*/g, "")
+        .replace(/^```json\s*/i, "")
+        .replace(/```$/, "")
+        .trim();
       parsed = JSON.parse(cleaned);
     } catch {
       return NextResponse.json(
