@@ -3,7 +3,7 @@
   "buildCommand": "next build",
   "outputDirectory": ".next",
   "installCommand": "npm install",
-  "regions": ["hkg1"],
+  "regions": ["iad1"],
   "env": {
     "NODE_ENV": "production"
   }
