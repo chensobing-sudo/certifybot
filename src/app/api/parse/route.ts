@@ -50,7 +50,7 @@ SPEC SHEET TEXT:
 ${rawText}
 `;
 
-    const llmRes = await fetch("https://api.minimax.io/v1/chat/completions", {
+    const llmRes = await fetch("https://api.minimaxi.com/v1/chat/completions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${minimaxKey}`,
