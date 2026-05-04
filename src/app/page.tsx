@@ -67,7 +67,7 @@ export default function HomePage() {
 
       if (!parseRes.ok) {
         const err = await parseRes.json();
-        throw new Error(err.error ?? "Parse failed");
+        throw new Error(err.detail ? `${err.error}: ${err.detail}` : err.error ?? "Parse failed");
       }
 
       const { product, rawTextFull } = await parseRes.json();

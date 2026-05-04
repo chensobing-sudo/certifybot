@@ -84,9 +84,13 @@ ${rawText}
         .replace(/```$/, "")
         .trim();
       parsed = JSON.parse(cleaned);
-    } catch {
+    } catch (parseErr: any) {
       return NextResponse.json(
-        { error: "Failed to parse LLM response", raw: content },
+        {
+          error: "Failed to parse LLM response",
+          detail: `Parse error: ${parseErr.message}`,
+          raw: content.slice(0, 2000),
+        },
         { status: 502 }
       );
     }
