@@ -1,6 +1,6 @@
 // API: Parse uploaded PDF/spec sheet using LLM
 // OCR layer: pdf-parse (text extraction from PDF)
-// LLM layer: DeepSeek for structured extraction
+// LLM layer: MiniMax M2.7 for structured extraction
 
 import { NextRequest, NextResponse } from "next/server";
 import pdfParse from "pdf-parse";
@@ -20,11 +20,11 @@ export async function POST(req: NextRequest) {
     const pdfData = await pdfParse(buffer);
     const rawText = pdfData.text.slice(0, 8000); // first 8000 chars
 
-    // ── 2. Use DeepSeek to extract product info ──
-    const deepseekKey = process.env.DEEPSEEK_API_KEY;
-    if (!deepseekKey) {
+    // ── 2. Use MiniMax M2.7 to extract product info ──
+    const minimaxKey = process.env.MINIMAX_API_KEY;
+    if (!minimaxKey) {
       return NextResponse.json(
-        { error: "DEEPSEEK_API_KEY not configured" },
+        { error: "MINIMAX_API_KEY not configured" },
         { status: 500 }
       );
     }
@@ -50,14 +50,14 @@ SPEC SHEET TEXT:
 ${rawText}
 `;
 
-    const llmRes = await fetch("https://api.deepseek.com/chat/completions", {
+    const llmRes = await fetch("https://api.minimax.io/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${deepseekKey}`,
+        Authorization: `Bearer ${minimaxKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "deepseek-chat",
+        model: "MiniMax-M2.7",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.1,
         max_tokens: 800,
@@ -67,7 +67,7 @@ ${rawText}
     if (!llmRes.ok) {
       const err = await llmRes.text();
       return NextResponse.json(
-        { error: `DeepSeek error: ${llmRes.status}`, detail: err },
+        { error: `MiniMax error: ${llmRes.status}`, detail: err },
         { status: 502 }
       );
     }
