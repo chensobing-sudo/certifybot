@@ -1,4 +1,5 @@
 // Market configuration registry — central source of truth for all supported markets
+// Dynamic loading: all markets in src/data/compliance/markets/ are auto-registered
 
 export interface CertStandard {
   name: string;
@@ -12,11 +13,11 @@ export interface CertStandard {
 }
 
 export interface MarketConfig {
-  code: string;           // e.g. "US", "AU", "UK"
-  label: string;          // e.g. "United States"
-  flag: string;           // e.g. "US"
-  currency: string;        // e.g. "USD"
-  language: string;       // e.g. "English"
+  code: string;           // e.g. "US", "EU", "CA"
+  label: string;          // e.g. "United States", "European Union"
+  flag: string;           // e.g. "US", "EU", "US-CA"
+  currency: string;        // e.g. "USD", "EUR"
+  language: string;       // e.g. "English", "Multilingual"
   standards: Record<string, CertStandard>;
   productTypeRequirements: Record<
     string,
@@ -28,14 +29,21 @@ export interface MarketConfig {
   };
 }
 
-export { usMarket } from "./markets/us";
-export { auMarket } from "./markets/au";
-export { ukMarket } from "./markets/uk";
+// ─── Market registry ───
+// Import all markets explicitly for tree-shaking and type safety
+
+import { usMarket } from "./markets/us";
+import { auMarket } from "./markets/au";
+import { ukMarket } from "./markets/uk";
+import { euMarket } from "../data/compliance/markets/eu";
+import { californiaMarket } from "../data/compliance/markets/california";
 
 export const ALL_MARKETS: MarketConfig[] = [
-  require("./markets/us").usMarket,
-  require("./markets/au").auMarket,
-  require("./markets/uk").ukMarket,
+  usMarket,
+  euMarket,
+  californiaMarket,
+  ukMarket,
+  auMarket,
 ];
 
 export const MARKET_MAP: Record<string, MarketConfig> = Object.fromEntries(
@@ -79,4 +87,26 @@ export function getCertCosts(
       return { cert: std.name, usd: std.fee, timeline: std.timeline };
     })
     .filter(Boolean) as { cert: string; usd: string; timeline: string }[];
+}
+
+// ─── Multi-market compliance check ───
+// Given a product type and list of target markets, return combined requirements
+export function getMultiMarketRequirements(
+  productType: string,
+  marketCodes: string[]
+): {
+  market: string;
+  required: string[];
+  optional: string[];
+  costs: { cert: string; usd: string; timeline: string }[];
+}[] {
+  return marketCodes
+    .map((code) => {
+      const market = getMarket(code);
+      if (!market) return null;
+      const reqs = getRequirementsForProductType(market, productType);
+      const costs = getCertCosts(market, reqs.required);
+      return { market: code, ...reqs, costs };
+    })
+    .filter(Boolean) as any;
 }

@@ -1,274 +1,65 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
-
-const MARKETS = [
-  {
-    code: "US",
-    label: "United States",
-    sublabel: "cUPC · NSF/ANSI 61 · NSF/ANSI 372",
-    color: "#3b82f6",
-  },
-  {
-    code: "AU",
-    label: "Australia",
-    sublabel: "WELS · WaterMark · AS/NZS Standards",
-    color: "#22c55e",
-  },
-  {
-    code: "UK",
-    label: "United Kingdom",
-    sublabel: "WRAS · UKCA · BS Standards",
-    color: "#ef4444",
-  },
-];
+import { ShieldCheck, FileText, Globe, Zap } from "lucide-react";
+import ProductForm from "@/components/compliance/product-form";
 
 export default function HomePage() {
-  const router = useRouter();
-  const [file, setFile] = useState<File | null>(null);
-  const [market, setMarket] = useState("US");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleFile = useCallback((f: File) => {
-    if (f.type === "application/pdf" || f.name.endsWith(".pdf")) {
-      setFile(f);
-      setError(null);
-    } else {
-      setError("Please upload a PDF file");
-    }
-  }, []);
-
-  const onDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      const f = e.dataTransfer.files[0];
-      if (f) handleFile(f);
-    },
-    [handleFile]
-  );
-
-  const handleUpload = async () => {
-    if (!file) return;
-    setLoading(true);
-    setError(null);
-
-    try {
-      // Step 1: Parse PDF → LLM
-      const parseForm = new FormData();
-      parseForm.append("file", file);
-
-      const parseRes = await fetch("/api/parse", {
-        method: "POST",
-        body: parseForm,
-      });
-
-      if (!parseRes.ok) {
-        const err = await parseRes.json();
-        throw new Error(err.detail ? `${err.error}: ${err.detail}` : err.error ?? "Parse failed");
-      }
-
-      const { product, rawTextFull } = await parseRes.json();
-
-      // Step 2: Generate compliance report for selected market
-      const queryRes = await fetch("/api/query", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ product, rawText: rawTextFull, market }),
-      });
-
-      if (!queryRes.ok) {
-        const err = await queryRes.json();
-        throw new Error(err.error ?? "Query failed");
-      }
-
-      const { report } = await queryRes.json();
-
-      // Step 3: Navigate to report
-      sessionStorage.setItem("certifybot_report", JSON.stringify(report));
-      router.push("/report");
-    } catch (err: any) {
-      setError(err.message ?? "Something went wrong");
-      setLoading(false);
-    }
-  };
-
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-8">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold tracking-tight mb-2">
-          CertifyBot
+    <main className="min-h-[calc(100vh-8rem)] flex flex-col items-center px-4 py-8 sm:py-12 sm:px-6 pb-safe-mobile">
+      {/* Hero */}
+      <div className="text-center mb-8 sm:mb-10 max-w-xl">
+        <div className="inline-flex items-center gap-2 rounded-full bg-[var(--accent-light)] px-3 sm:px-4 py-1 sm:py-1.5 mb-3 sm:mb-4">
+          <ShieldCheck className="h-3 sm:h-3.5 w-3 sm:w-3.5 text-[var(--accent)]" />
+          <span className="text-[10px] sm:text-xs font-medium text-[var(--accent)]">
+            亚马逊卫浴合规 AI Agent
+          </span>
+        </div>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text)] mb-2 sm:mb-3">
+          ComplianceGuard
         </h1>
-        <p className="text-[var(--muted)] text-sm tracking-widest uppercase">
-          出口合规通 · SpecFit
+        <p className="text-sm sm:text-base text-[var(--text-secondary)]">
+          输入产品参数，分钟级输出多国合规路径与认证清单
         </p>
       </div>
 
-      {/* Upload card */}
-      <div className="w-full max-w-lg">
-        <div
-          className={`
-            border-2 border-dashed rounded-none p-12 text-center cursor-pointer transition-colors
-            ${file ? "border-[var(--accent)]" : "border-[var(--border)] hover:border-[var(--muted)]"}
-          `}
-          onDragOver={(e) => {
-            e.preventDefault();
-          }}
-          onDrop={onDrop}
-          onClick={() => inputRef.current?.click()}
-        >
-          <input
-            ref={inputRef}
-            type="file"
-            accept=".pdf"
-            className="hidden"
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) handleFile(f);
-            }}
-          />
+      {/* Product Form */}
+      <ProductForm />
 
-          {file ? (
-            <div className="flex flex-col items-center gap-3">
-              <div className="text-3xl">📄</div>
-              <p className="text-[var(--text)] font-medium">{file.name}</p>
-              <p className="text-[var(--muted)] text-xs">
-                {(file.size / 1024 / 1024).toFixed(2)} MB
+      {/* Features */}
+      <div className="mt-10 sm:mt-16 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 max-w-2xl w-full">
+        {[
+          {
+            icon: Globe,
+            title: "5 大市场覆盖",
+            desc: "美国 · 欧盟 · 加州 · 英国 · 澳大利亚",
+          },
+          {
+            icon: Zap,
+            title: "AI 决策树引擎",
+            desc: "材质 × 产品类型 × 市场交叉判断合规需求",
+          },
+          {
+            icon: FileText,
+            title: "完整操作清单",
+            desc: "认证机构 · 费用估算 · 申请步骤 · 时间线",
+          },
+        ].map((feature) => {
+          const Icon = feature.icon;
+          return (
+            <div
+              key={feature.title}
+              className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 sm:p-4 text-center card-hover active:scale-[0.97] transition-transform"
+            >
+              <div className="inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-[var(--accent-light)] mb-2 sm:mb-3">
+                <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--accent)]" />
+              </div>
+              <p className="text-xs sm:text-sm font-medium text-[var(--text)] mb-0.5 sm:mb-1">
+                {feature.title}
               </p>
-              <button
-                className="text-xs text-[var(--muted)] underline mt-2"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setFile(null);
-                }}
-              >
-                Remove
-              </button>
+              <p className="text-[10px] sm:text-xs text-[var(--muted)]">{feature.desc}</p>
             </div>
-          ) : (
-            <div className="flex flex-col items-center gap-3">
-              <div className="text-3xl">⬆</div>
-              <p className="text-[var(--text)]">
-                Drop PDF here or click to upload
-              </p>
-              <p className="text-[var(--muted)] text-xs">
-                Product spec sheet, specification sheet, or catalog page
-              </p>
-            </div>
-          )}
-        </div>
-
-        {error && (
-          <p className="text-[var(--red)] text-sm mt-4 text-center">{error}</p>
-        )}
-
-        {/* Market selector */}
-        <div className="mt-6">
-          <label className="text-xs text-[var(--muted)] uppercase tracking-widest mb-3 block">
-            Target Market
-          </label>
-          <div className="grid grid-cols-3 gap-2">
-            {MARKETS.map((m) => (
-              <button
-                key={m.code}
-                onClick={() => setMarket(m.code)}
-                className={`
-                  border px-3 py-3 text-left transition-colors text-xs
-                  ${
-                    market === m.code
-                      ? "border-[var(--accent)] bg-[var(--accent)]/5"
-                      : "border-[var(--border)] hover:border-[var(--muted)]"
-                  }
-                `}
-              >
-                <div className="flex items-center gap-1.5 mb-1">
-                  <span
-                    className="inline-block w-2 h-2 rounded-full"
-                    style={{
-                      backgroundColor:
-                        market === m.code ? "var(--accent)" : "var(--muted)",
-                    }}
-                  />
-                  <span className="font-bold">{m.code}</span>
-                </div>
-                <div className="text-[10px] text-[var(--muted)] leading-tight">
-                  {m.label}
-                </div>
-              </button>
-            ))}
-          </div>
-          <div className="mt-2 px-2 py-2 border border-[var(--border)] text-[10px] text-[var(--muted)]">
-            {MARKETS.find((m) => m.code === market)?.sublabel}
-          </div>
-        </div>
-
-        {/* CTA */}
-        <button
-          className={`
-            w-full mt-6 py-4 text-sm font-bold tracking-widest uppercase transition-colors
-            ${
-              file && !loading
-                ? "bg-[var(--accent)] text-black hover:bg-[var(--accent)]/90"
-                : "bg-[var(--border)] text-[var(--muted)] cursor-not-allowed"
-            }
-          `}
-          disabled={!file || loading}
-          onClick={handleUpload}
-        >
-          {loading ? (
-            <span className="flex items-center justify-center gap-2">
-              <span className="animate-spin">◌</span>
-              Analyzing...
-            </span>
-          ) : (
-            `Analyze for ${MARKETS.find((m) => m.code === market)?.label}`
-          )}
-        </button>
-
-        <p className="text-[var(--muted)] text-xs text-center mt-3">
-          ~3 minutes · Official certification database
-        </p>
-      </div>
-
-      {/* Supported certs */}
-      <div className="mt-12 text-center">
-        <p className="text-[10px] uppercase tracking-widest text-[var(--muted)] mb-3">
-          Supported Certifications
-        </p>
-        <div className="flex flex-wrap gap-2 justify-center max-w-md">
-          {market === "US" &&
-            ["cUPC", "NSF/ANSI 61", "NSF/ANSI 372", "WaterSense", "IAPMO Z124"].map(
-              (c) => (
-                <span
-                  key={c}
-                  className="text-[10px] px-2 py-1 border border-[var(--border)] text-[var(--muted)]"
-                >
-                  {c}
-                </span>
-              )
-            )}
-          {market === "AU" &&
-            ["WELS", "WaterMark", "AS/NZS 4020", "AS/NZS 3718"].map((c) => (
-              <span
-                key={c}
-                className="text-[10px] px-2 py-1 border border-[var(--border)] text-[var(--muted)]"
-              >
-                {c}
-              </span>
-            ))}
-          {market === "UK" &&
-            ["WRAS", "UKCA", "BS 6920", "KIWA", "BS EN 817"].map((c) => (
-              <span
-                key={c}
-                className="text-[10px] px-2 py-1 border border-[var(--border)] text-[var(--muted)]"
-              >
-                {c}
-              </span>
-            ))}
-        </div>
+          );
+        })}
       </div>
     </main>
   );
