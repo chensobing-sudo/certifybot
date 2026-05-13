@@ -292,6 +292,47 @@ function getMaterialRules(
     }
   }
 
+  // ─── Electrical safety rules ───
+  // Products with electrical components need additional safety certifications
+  if (params.hasElectricalComponents) {
+    if (market.code === "US" || market.code === "CA") {
+      rules.push({
+        condition: `has electrical components in ${market.code}`,
+        market: market.code,
+        certKey: "UL",
+        priority: "critical",
+        rationale: `含电气组件的卫浴产品在美国/加州市场必须通过 UL 安全认证（UL 1431 个人卫浴器具 或 UL 1951 电动管道器具），亚马逊已加强 UL 认证审核。`,
+      });
+    }
+    if (market.code === "EU") {
+      rules.push({
+        condition: `has electrical components in EU`,
+        market: market.code,
+        certKey: "CE_CPR",
+        priority: "critical",
+        rationale: `含电气组件的产品在欧盟市场需要 CE 标志，涵盖低电压指令（LVD 2014/35/EU）和电磁兼容性指令（EMC 2014/30/EU）。`,
+      });
+    }
+    if (market.code === "UK") {
+      rules.push({
+        condition: `has electrical components in UK`,
+        market: market.code,
+        certKey: "UKCA",
+        priority: "critical",
+        rationale: `含电气组件的产品在英国市场需要 UKCA 标志，涵盖电气安全（S.I. 2016/1101）和电磁兼容性（S.I. 2016/1091）。`,
+      });
+    }
+    if (market.code === "AU") {
+      rules.push({
+        condition: `has electrical components in AU`,
+        market: market.code,
+        certKey: "RCM",
+        priority: "critical",
+        rationale: `含电气组件的产品在澳大利亚需要 RCM（Regulatory Compliance Mark）认证，涵盖电气安全和 EMC 要求。`,
+      });
+    }
+  }
+
   // Ceramic → specific standards
   if (params.material === "ceramic") {
     if (market.code === "US") {

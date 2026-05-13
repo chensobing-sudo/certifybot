@@ -100,6 +100,22 @@ export const usMarket: MarketConfig = {
       timeline: "8–20 weeks",
       required: false,
     },
+    UL: {
+      name: "UL 1431 / UL 1951 – Electrical Safety for Plumbing Products",
+      issuer: "Underwriters Laboratories",
+      scope: "Electrically operated plumbing products — smart toilets, electric faucets, heated bidets",
+      url: "https://www.ul.com/services/plumbing-products",
+      testItems: [
+        "Electrical shock protection",
+        "Overheating protection",
+        "Water ingress protection (IP rating)",
+        "Grounding continuity",
+        "Component stress test",
+      ],
+      fee: "$8,000–$25,000",
+      timeline: "8–16 weeks",
+      required: false,
+    },
   },
   productTypeRequirements: {
     faucet: {

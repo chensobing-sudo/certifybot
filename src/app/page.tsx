@@ -1,7 +1,8 @@
 "use client";
 
-import { ShieldCheck, FileText, Globe, Zap } from "lucide-react";
+import { ShieldCheck, FileText, Globe, Zap, MessageSquare } from "lucide-react";
 import ProductForm from "@/components/compliance/product-form";
+import { ChatWidget } from "@/components/chat/chat-widget";
 
 export default function HomePage() {
   return (
@@ -61,6 +62,9 @@ export default function HomePage() {
           );
         })}
       </div>
+
+      {/* Chat Widget */}
+      <ChatWidget />
     </main>
   );
 }

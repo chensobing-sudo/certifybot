@@ -93,6 +93,22 @@ export const auMarket: MarketConfig = {
       timeline: "6–10 weeks",
       required: false,
     },
+    RCM: {
+      name: "RCM – Regulatory Compliance Mark (Electrical Safety & EMC)",
+      issuer: "Australian Communications and Media Authority / EESS",
+      scope: "Electrically operated plumbing products — smart toilets, electric faucets, heated bidets",
+      url: "https://www.acma.gov.au/rcm-regulatory-compliance-mark",
+      testItems: [
+        "Electrical safety (AS/NZS 60335)",
+        "EMC emissions (AS/NZS CISPR 14)",
+        "Water ingress protection (IP rating)",
+        "Declaration of conformity",
+        "Responsible supplier registration",
+      ],
+      fee: "A$3,000–$10,000",
+      timeline: "6–12 weeks",
+      required: false,
+    },
   },
   productTypeRequirements: {
     faucet: {

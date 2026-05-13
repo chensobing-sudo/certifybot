@@ -3,13 +3,14 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
-import { Shield, MessageSquareHeart, FileSearch, Receipt, Menu, X, Home, Globe } from "lucide-react"
+import { Shield, MessageSquareHeart, FileSearch, Receipt, Menu, X, Home, Globe, Bell } from "lucide-react"
 
 const NAV_ITEMS = [
   { href: "/", label: "首页", icon: Home },
   { href: "/compliance", label: "合规路径", icon: Globe },
   { href: "/report", label: "合规报告", icon: FileSearch },
   { href: "/tax", label: "税务合规", icon: Receipt },
+  { href: "/amazon-policies", label: "政策预警", icon: Bell },
   { href: "/feedback", label: "反馈", icon: MessageSquareHeart },
 ]
 

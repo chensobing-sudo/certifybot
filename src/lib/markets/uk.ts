@@ -99,6 +99,22 @@ export const ukMarket: MarketConfig = {
       timeline: "6–12 weeks",
       required: false,
     },
+    UKCA_ELECTRICAL: {
+      name: "UKCA – Electrical Safety (S.I. 2016/1101) & EMC (S.I. 2016/1091)",
+      issuer: "UK Government / Approved Body",
+      scope: "Electrically operated plumbing products — smart toilets, electric faucets, heated bidets",
+      url: "https://www.gov.uk/guidance/electrical-equipment-safety-regulations",
+      testItems: [
+        "Electrical shock protection",
+        "Overheating protection",
+        "Water ingress protection (IP rating)",
+        "EMC emissions and immunity",
+        "Technical documentation review",
+      ],
+      fee: "£3,000–£12,000",
+      timeline: "8–16 weeks",
+      required: false,
+    },
   },
   productTypeRequirements: {
     faucet: {
